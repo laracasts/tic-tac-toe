@@ -3,6 +3,7 @@
         Testing!
     </AuthenticatedLayout>
 </template>
-<script setup lang="ts">
+
+<script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 </script>
