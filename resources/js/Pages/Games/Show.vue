@@ -1,6 +1,6 @@
 <template>
     <AuthenticatedLayout>
-        Testing!
+        {{ $page.props }}
     </AuthenticatedLayout>
 </template>
 

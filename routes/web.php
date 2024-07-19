@@ -15,16 +15,15 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::redirect('/dashboard', '/games')->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('games', GameController::class)->only(['store', 'show']);
+    Route::resource('games', GameController::class)->only(['index', 'store', 'show']);
+    Route::post('/games/{game}/join', [GameController::class, 'join'])->name('games.join');
 });
 
 require __DIR__.'/auth.php';
