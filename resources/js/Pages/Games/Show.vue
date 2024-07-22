@@ -17,7 +17,38 @@ const boardState = ref([0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
 const xTurn = computed(() => boardState.value.reduce((carry, value) => carry + value, 0) === 0);
 
+const lines = [
+    // rows
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    // columns
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    // diagonals
+    [0, 4, 8],
+    [2, 4, 6],
+];
+
 const fillSquare = (index) => {
     boardState.value[index] = xTurn.value ? -1 : 1;
+
+    const winningLine = lines.map((line) => line.reduce((carry, index) => carry + boardState.value[index], 0))
+        .find((sum) => Math.abs(sum) === 3);
+
+    if (winningLine === -3) {
+        alert("X has won!");
+        return;
+    }
+
+    if (winningLine === 3) {
+        alert("O has won!");
+        return;
+    }
+
+    if (! boardState.value.includes(0)) {
+        alert("Stalemate!");
+    }
 };
 </script>
