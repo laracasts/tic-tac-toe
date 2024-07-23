@@ -7,6 +7,21 @@
                 <span v-else v-text="square === -1 ? 'X' : 'O'" class="text-4xl font-bold"></span>
             </li>
         </menu>
+
+        <ul class="max-w-sm mx-auto mt-6 space-y-2">
+            <li class="flex items-center gap-2">
+                <span class="p-1.5 font-bold rounded bg-gray-200">X</span>
+                <span>{{ game.player_one.name }}</span>
+                <span :class="{ '!bg-green-500': players.find(({id}) => id === game.player_one_id) }" class="bg-red-500 size-2 rounded-full"></span>
+            </li>
+            <li v-if="game.player_two" class="flex items-center gap-2">
+                <span class="p-1.5 font-bold rounded bg-gray-200">O</span>
+                <span>Luke</span>
+                <span :class="{ '!bg-green-500': players.find(({id}) => id === game.player_two_id) }" class="bg-red-500 size-2 rounded-full"></span>
+            </li>
+            <li v-else>Waiting for player two…</li>
+        </ul>
+
         <Modal @close="resetGame()" :show="gameState.hasEnded()">
             <div class="p-6">
                 <div class="text-6xl font-bold text-center my-12 font-mono uppercase">
@@ -25,13 +40,17 @@
 
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {computed, ref} from "vue";
+import {computed, onUnmounted, ref} from "vue";
 import Modal from "@/Components/Modal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {useGameState, gameStates} from "@/Composables/useGameState.js";
+import {router} from "@inertiajs/vue3";
+
+const props = defineProps(['game']);
 
 const boardState = ref([0, 0, 0, 0, 0, 0, 0, 0, 0]);
 const gameState = useGameState();
+const players = ref([]);
 
 const xTurn = computed(() => boardState.value.reduce((carry, value) => carry + value, 0) === 0);
 
@@ -78,4 +97,15 @@ const resetGame = () => {
     boardState.value = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     gameState.change(gameStates.InProgress);
 };
+
+Echo.join(`games.${props.game.id}`)
+    .here((users) => players.value = users)
+    .joining((user) => router.reload({
+        onSuccess: () => players.value.push(user)
+    }))
+    .leaving((user) => players.value = players.value.filter(({id}) => id !== user.id));
+
+onUnmounted(() => {
+    Echo.leave(`games.${props.game.id}`);
+});
 </script>
