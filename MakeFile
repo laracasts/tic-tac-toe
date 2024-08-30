@@ -1,0 +1,35 @@
+# Start containerne og bygger hvis nødvendigt
+up:
+	docker compose up --build -d
+
+# Stopper og fjerner containerne
+down:
+	docker compose down
+
+# Genstarter containerne
+restart: down up
+
+# Bygger containerne uden at starte dem
+build:
+	docker compose build
+
+# Viser logs fra containerne
+logs:
+	docker compose logs -f
+
+# Renser op og fjerner unødvendige filer
+clean:
+	docker compose down -v --remove-orphans
+	docker system prune -f
+
+# Installerer Composer afhængigheder inde i app containeren
+install:
+	docker compose exec app composer install
+
+# Kører Artisan kommando inde i app containeren
+artisan:
+	docker compose exec app php artisan
+
+# Åbner en bash shell i app containeren
+shell:
+	docker compose exec app bash
